@@ -1,39 +1,41 @@
-# Project: Run an express app in a Docker container
+FROM php:7.4-fpm-alpine
 
-# Step 1: Use the 'node' official image (a recent version with an alpine base)
-FROM node:latest
+# Copy File Config
+ADD ./compose/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 
-# Step 2: Look in the app.js to determine which port to expose
-EXPOSE 8081
+# ADD and set Group
+RUN addgroup -g 1000 laravel && adduser -G laravel -g laravel -s /bin/sh -D laravel
 
-# Step 3: Use alpine package manager to install tini: 'apk add --update tini'
-#   (tini is a package that can be used as an entry point in a container)
-RUN apk add --update tini
+# Create folder to run
+RUN mkdir -p /var/www/html
 
-# Step 4: With a single command, create a new directory for app files at the
-#   path '/usr/src/app' and make that your current directory
-WORKDIR /usr/src/app
+# Set Profile
+RUN chown laravel:laravel /var/www/html
 
-# In the next steps, you will load and install packages before applications
-#   files for better caching
+# Work in the specific space
+WORKDIR /var/www/html
 
-# Step 5: Since node uses a "package manager", copy in 'package.json' and the
-#   corresponding lock file
-COPY package.json /usr/src/app/
-COPY package-lock.json /usr/src/app/
+# Install dependencies
+RUN apk add --no-cache \
+    freetype \
+    libpng \
+    libjpeg-turbo \
+    freetype-dev \
+    libpng-dev \
+    libjpeg-turbo-dev
 
-# Step 6: Install dependencies using npm
-#   To keep the image clean and small, run 'npm cache clean --force' after
-RUN npm install
-RUN npm cache clean --force
+RUN docker-php-ext-configure gd \
+    --with-freetype \
+    --with-jpeg 
 
-# Step 7: Copy in all files from current directory
-COPY routes.js /usr/src/app/
-COPY app.js /usr/src/app/
-COPY views /usr/src/app/
+RUN NPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) && \
+    docker-php-ext-install -j${NPROC} gd 
 
-# Step 8. Run the application with command '/sbin/tini -- node app.js'.
-#   Remember to use the "exec form" which is the preferred syntax
-#   Here is the documentation for CMD if you need a reminder:
-#   https://docs.docker.com/engine/reference/builder/#cmd
-CMD ["/sbin/tini", "--", "node", "app.js"]
+RUN apk del --no-cache freetype-dev libpng-dev libjpeg-turbo-dev
+
+RUN docker-php-ext-install pdo pdo_mysql
+
+# install and enable xdebug
+RUN apk add --no-cache $PHPIZE_DEPS \
+	&& pecl install xdebug-2.9.7 \
+	&& docker-php-ext-enable xdebug
