@@ -30,7 +30,8 @@ RUN rm -rf vendor composer.lock && \
 	composer install --no-dev --no-scripts --ignore-platform-reqs && \
 	composer dump-autoload && \
 	composer clear-cache && \
-	rm -rf ~/.composer/cache*
+	
+ 
 
 RUN composer require laravel/breeze --dev
 
