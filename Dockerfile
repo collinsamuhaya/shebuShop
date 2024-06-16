@@ -1,97 +1,64 @@
-#Client App
-FROM node:14.15.0 as vuejs
+FROM php:8.0-fpm
 
-LABEL authors="Collins Amuhaya"
+ #Copy composer.lock and composer.json
+#COPY  ./composer.json /var/www/
 
-RUN mkdir -p /app/public
+# Set working directory
+WORKDIR /var/www
 
-
-COPY resources/ /app/resources/
-
-WORKDIR /app
-
-RUN npm install && npm run prod
-
-
-#Server Dependencies
-FROM composer:2.0.8 as vendor
-
-WORKDIR /app
-
-COPY database/ database/
-
-COPY composer.json composer.json
-COPY composer.lock composer.lock
-
-RUN composer install \
-    --ignore-platform-reqs \
-    --no-interaction \
-    --no-plugins \
-    --no-scripts \
-    --prefer-dist
-
-#Final Image
-FROM php:7.4-apache as base
-#install php dependencies
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpng-dev \
-    libonig-dev \
     libjpeg62-turbo-dev \
     libfreetype6-dev \
     locales \
-    libzip-dev \
     zip \
     jpegoptim optipng pngquant gifsicle \
+    vim \
     unzip \
     git \
     curl
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl
-
-# change the document root to /var/www/html/public
-RUN sed -i -e "s/html/html\/public/g" \
-    /etc/apache2/sites-enabled/000-default.conf
-
-# enable apache mod_rewrite
-RUN a2enmod rewrite
-
-WORKDIR /var/www/html
-
-COPY . /var/www/html
-COPY --from=vendor /app/vendor/ /var/www/html/vendor/
-COPY --from=vuejs /app/public/js/ /var/www/html/public/js/
-COPY --from=vuejs /app/public/css/ /var/www/html/public/css/
-COPY --from=vuejs /app/mix-manifest.json /var/www/html/mix-manifest.json
 
 
-RUN npm install && npm run prod
 
-RUN rm -rf /var/www/html/public/storage
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
-# these directories need to be writable by Apache
-RUN chown -R www-data:www-data /var/www/html/storage \
-    /var/www/html/bootstrap/cache
+# Install PHP extensions
 
-# copy env file for our Docker image
-# COPY env.docker /var/www/html/.env
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
-# create sqlite db structure
-RUN mkdir -p storage/app \
-    && touch storage/app/db.sqlite
+RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
+    install-php-extensions mbstring pdo_mysql zip exif pcntl gd
 
-RUN chown -R www-data:www-data \
-    /var/www/html \
-    /var/www/html/storage \
-    /var/www/html/bootstrap/cache
 
-RUN chmod -R 775 /var/www/html/storage
 
-RUN php artisan key:generate --ansi \
-    && php artisan storage:link
+# Install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-VOLUME ["/var/www/html/storage", "/var/www/html/bootstrap/cache"]
+#Installing node 12.x
+RUN curl -sL https://deb.nodesource.com/setup_12.x| bash -
+RUN apt-get install -y nodejs
 
-EXPOSE 80
+
+# Add user for laravel application
+RUN groupadd -g 1000 www
+RUN useradd -u 1000 -ms /bin/bash -g www www
+
+RUN chown -R www:www /var/www
+# Copy existing application directory contents
+#COPY ./src/. /var/www
+
+# Copy existing application directory permissions
+COPY --chown=www:www . /var/www
+
+# Change current user to www
+USER www
+
+#RUN composer install --no-scripts --no-autoloader
+
+# Expose port 9000 and start php-fpm server
+EXPOSE 9000
+CMD ["php-fpm"]
