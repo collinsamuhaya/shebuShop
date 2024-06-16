@@ -62,24 +62,40 @@ USER www
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
 CMD ["php-fpm"]
-# Install PHP extensions required by Laravel
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+FROM php:8.1-fpm
 
-# Install Composer (dependency manager for PHP)
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN apt-get update -y \
+	&& apt-get install -y libmcrypt-dev openssl openssh-client git zip unzip \
+	&& apt-get clean \
+	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Copy the Laravel project files into the container
-COPY . .
+# Fixed version of composer for php 8.1
+COPY --from=composer:2.4.3 /usr/bin/composer /usr/bin/composer
+# RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Install project dependencies using Composer
-RUN composer install --no-interaction --no-dev --prefer-dist
+RUN pecl install mcrypt-1.0.5 
+RUN docker-php-ext-enable mcrypt
+RUN docker-php-ext-install mysqli pdo_mysql
 
-# Generate the application key
-RUN php artisan key:generate
+ARG working_dir=/var/www/laravel-app/
+RUN useradd --uid 1000 --user-group -ms /bin/bash www
+#RUN mkdir $working_dir && chown -R www:www $working_dir
 
-# Expose port 8000 for accessing the Laravel service
-EXPOSE 9000
+WORKDIR /tmp
+ADD https://github.com/laravel/laravel/archive/refs/tags/v9.0.0.tar.gz .
+RUN tar -xzvf v9.0.0.tar.gz && mv laravel-9.0.0 $working_dir
 
-# Start the Laravel service
-CMD php artisan serve --host=0.0.0.0 --port=9000
+RUN chown -R www:www $working_dir
+WORKDIR $working_dir
+USER www
+
+RUN rm -rf vendor composer.lock && \
+	composer config disable-tls true && \
+	composer install --no-dev --no-scripts --ignore-platform-reqs && \
+	composer dump-autoload && \
+	composer clear-cache && \
+
+
+CMD php artisan migrate && php artisan serve --host=0.0.0.0 --port=9000
+
 
