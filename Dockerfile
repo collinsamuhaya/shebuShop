@@ -62,3 +62,4 @@ USER www
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
 CMD ["php-fpm"]
+CMD ["./node_modules/.bin/vite", "--host", "0.0.0.0", "--port", "9000"]
