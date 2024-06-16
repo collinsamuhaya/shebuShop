@@ -62,4 +62,24 @@ USER www
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
 CMD ["php-fpm"]
-CMD ["./node_modules/.bin/vite", "--host", "0.0.0.0", "--port", "9000"]
+# Install PHP extensions required by Laravel
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+
+# Install Composer (dependency manager for PHP)
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Copy the Laravel project files into the container
+COPY . .
+
+# Install project dependencies using Composer
+RUN composer install --no-interaction --no-dev --prefer-dist
+
+# Generate the application key
+RUN php artisan key:generate
+
+# Expose port 8000 for accessing the Laravel service
+EXPOSE 9000
+
+# Start the Laravel service
+CMD php artisan serve --host=0.0.0.0 --port=9000
+
