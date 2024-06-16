@@ -1,68 +1,58 @@
-FROM php:8.0-fpm
+#start with our base image (the foundation) - version 7.1.5
+FROM php:7.1.5-apache
 
-# Argument
-ARG env_profile
-ENV ENV_PROFILE=${env_profile}
+#adding repo to /etc/apt/sources.list
+RUN printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list
 
-# Set working directory
-WORKDIR /var/www
-
-# Add docker php ext repo
-ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
-
-# Install php extensions
-RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
-    install-php-extensions mbstring pdo_mysql zip exif pcntl gd memcached
-
-# Install dependencies
+#install all the system dependencies and enable PHP modules 
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    locales \
-    zip \
-    jpegoptim optipng pngquant gifsicle \
-    unzip \
-    git \
-    curl \
-    lua-zlib-dev \
-    libmemcached-dev \
-  
+      libicu-dev \
+      libpq-dev \
+      libmcrypt-dev \
+      git \
+      zip \
+      unzip \
+    && rm -r /var/lib/apt/lists/* \
+    && docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
+    && docker-php-ext-install \
+      intl \
+      mbstring \
+      mcrypt \
+      pcntl \
+      pdo_mysql \
+      pdo_pgsql \
+      pgsql \
+      zip \
+      opcache
 
-# Install supervisor
-RUN apt-get install -y supervisor
+# Install Node.js
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash
+RUN apt-get install --yes nodejs
 
-# Install composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+#install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+#set our application folder as an environment variable
+ENV APP_HOME /var/www/html
 
-# Add user for laravel application
-RUN groupadd -g 1000 www
-RUN useradd -u 1000 -ms /bin/bash -g www www
+#change uid and gid of apache to docker user uid/gid
+RUN usermod -u 1000 www-data && groupmod -g 1000 www-data
 
-# Copy code to /var/www
-COPY --chown=www:www-data . /var/www
-RUN mv /var/www/.env.${ENV_PROFILE} /var/www/.env 
-RUN ls -a /var/www/
+#change the web_root to laravel /var/www/html/public folder
+RUN sed -i -e "s/html/html\/public/g" /etc/apache2/sites-enabled/000-default.conf
 
-# add root to www group
-RUN chmod -R ug+w /var/www/storage
+# enable apache module rewrite
+RUN a2enmod rewrite
 
-# Copy docker configs
-COPY docker/supervisor.conf /etc/supervisord.conf
-COPY docker/php.ini /usr/local/etc/php/conf.d/app.ini
+#copy source files and run composer
+COPY . $APP_HOME
 
+# install all PHP dependencies
+RUN composer install --no-interaction
 
-# PHP Error Log Files
-RUN mkdir /var/log/php
-RUN touch /var/log/php/errors.log && chmod 777 /var/log/php/errors.log
+#change ownership of our applications
+RUN chown -R www-data:www-data $APP_HOME
 
-# Deployment steps
-RUN composer install --optimize-autoloader --no-dev
-RUN chmod +x /var/www/docker/run.sh
-
-EXPOSE 8080
-ENTRYPOINT ["/var/www/docker/run.sh"]
+RUN php artisan key:generate
+RUN npm rebuild node-sass
+RUN npm install && npm run dev
