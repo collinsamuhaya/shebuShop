@@ -59,9 +59,7 @@ USER www
 
 #RUN composer install --no-scripts --no-autoloader
 
-# Expose port 9000 and start php-fpm server
-EXPOSE 9000
-CMD ["php-fpm"]
+
 FROM php:8.1-fpm
 
 RUN apt-get update -y \
@@ -96,6 +94,8 @@ RUN rm -rf vendor composer.lock && \
 	composer clear-cache && \
 
 
-CMD php artisan migrate && php artisan serve --host=0.0.0.0 --port=9000
+# Expose port 9000 and start php-fpm server
+EXPOSE 9000
+CMD ["php-fpm"]
 
 
