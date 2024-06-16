@@ -30,10 +30,6 @@ RUN rm -rf vendor composer.lock && \
 	composer install --no-dev --no-scripts --ignore-platform-reqs && \
 	composer dump-autoload && \
 	composer clear-cache && \
-	rm -rf ~/.composer/cache*
-
-RUN composer require laravel/breeze --dev
-
-RUN php artisan breeze:install api 
+ 
 
 CMD php artisan migrate && php artisan serve --host=0.0.0.0 --port=8000
