@@ -33,4 +33,4 @@ RUN rm -rf vendor composer.lock && \
 
 
 EXPOSE 8000
-CMD ["php-fpm"]
+CMD ["./node_modules/.bin/vite", "--host", "0.0.0.0", "--port", "8000"]
