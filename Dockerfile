@@ -64,7 +64,7 @@ COPY --from=vuejs /app/public/css/ /var/www/html/public/css/
 COPY --from=vuejs /app/mix-manifest.json /var/www/html/mix-manifest.json
 
 
-
+RUN npm install && npm run prod
 
 RUN rm -rf /var/www/html/public/storage
 
