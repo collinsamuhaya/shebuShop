@@ -1,58 +1,64 @@
-#start with our base image (the foundation) - version 7.1.5
-FROM php:7.1.5-apache
+FROM php:8.0-fpm
 
-#adding repo to /etc/apt/sources.list
-RUN printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list
+ #Copy composer.lock and composer.json
+#COPY  ./composer.json /var/www/
 
-#install all the system dependencies and enable PHP modules 
+# Set working directory
+WORKDIR /var/www
+
+# Install dependencies
 RUN apt-get update && apt-get install -y \
-      libicu-dev \
-      libpq-dev \
-      libmcrypt-dev \
-      git \
-      zip \
-      unzip \
-    && rm -r /var/lib/apt/lists/* \
-    && docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
-    && docker-php-ext-install \
-      intl \
-      mbstring \
-      mcrypt \
-      pcntl \
-      pdo_mysql \
-      pdo_pgsql \
-      pgsql \
-      zip \
-      opcache
+    build-essential \
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    locales \
+    zip \
+    jpegoptim optipng pngquant gifsicle \
+    vim \
+    unzip \
+    git \
+    curl
 
-# Install Node.js
-RUN curl -sL https://deb.nodesource.com/setup_8.x | bash
-RUN apt-get install --yes nodejs
 
-#install composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
 
-#set our application folder as an environment variable
-ENV APP_HOME /var/www/html
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-#change uid and gid of apache to docker user uid/gid
-RUN usermod -u 1000 www-data && groupmod -g 1000 www-data
 
-#change the web_root to laravel /var/www/html/public folder
-RUN sed -i -e "s/html/html\/public/g" /etc/apache2/sites-enabled/000-default.conf
+# Install PHP extensions
 
-# enable apache module rewrite
-RUN a2enmod rewrite
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
-#copy source files and run composer
-COPY . $APP_HOME
+RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
+    install-php-extensions mbstring pdo_mysql zip exif pcntl gd
 
-# install all PHP dependencies
-RUN composer install --no-interaction
 
-#change ownership of our applications
-RUN chown -R www-data:www-data $APP_HOME
 
-RUN php artisan key:generate
-RUN npm rebuild node-sass
-RUN npm install && npm run dev
+# Install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+#Installing node 12.x
+RUN curl -sL https://deb.nodesource.com/setup_12.x| bash -
+RUN apt-get install -y nodejs
+
+
+# Add user for laravel application
+RUN groupadd -g 1000 www
+RUN useradd -u 1000 -ms /bin/bash -g www www
+
+RUN chown -R www:www /var/www
+# Copy existing application directory contents
+#COPY ./src/. /var/www
+
+# Copy existing application directory permissions
+COPY --chown=www:www . /var/www
+
+# Change current user to www
+USER www
+
+#RUN composer install --no-scripts --no-autoloader
+
+# Expose port 9000 and start php-fpm server
+EXPOSE 9000
+CMD ["php-fpm"]
