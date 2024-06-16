@@ -1,67 +1,25 @@
-FROM php:8.0-fpm
-FROM node:14.15.0 as vuejs
+FROM php:8.1-fpm-alpine
 
-LABEL authors="Collins Amuhaya"
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
- #Copy composer.lock and composer.json
-#COPY  ./composer.json /var/www/
+RUN mkdir -p /var/www/html
 
-# Set working directory
-WORKDIR /var/www
+WORKDIR /var/www/html
 
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    locales \
-    zip \
-    jpegoptim optipng pngquant gifsicle \
-    vim \
-    unzip \
-    git \
-    curl
+RUN docker-php-ext-install pdo pdo_mysql
 
+EXPOSE 8082
+EXPOSE 6001
 
+ADD scripts/ /srv/
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+CMD ["/bin/sh", "/srv/startup.sh"]
+FROM node:current-alpine
 
+RUN mkdir -p /var/www/html
 
-# Install PHP extensions
+WORKDIR /var/www/html
 
-ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+EXPOSE 8081
 
-RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
-    install-php-extensions mbstring pdo_mysql zip exif pcntl gd
-
-
-
-# Install composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-#Installing node 12.x
-RUN curl -sL https://deb.nodesource.com/setup_12.x| bash -
-RUN apt-get install -y nodejs
-
-
-# Add user for laravel application
-RUN groupadd -g 1000 www
-RUN useradd -u 1000 -ms /bin/bash -g www www
-
-RUN chown -R www:www /var/www
-# Copy existing application directory contents
-#COPY ./src/. /var/www
-
-# Copy existing application directory permissions
-COPY --chown=www:www . /var/www
-
-# Change current user to www
-USER www
-
-#RUN composer install --no-scripts --no-autoloader
-
-# Expose port 9000 and start php-fpm server
-# EXPOSE 9000
-CMD ["php-fpm"]
+CMD ["./node_modules/.bin/vite", "--host", "0.0.0.0", "--port", "8081"]
