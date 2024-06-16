@@ -1,64 +1,36 @@
-FROM php:7.4-fpm-alpine
+# Use the official PHP image with version 8.2 as the base image
+FROM php:8.2
 
-# Copy File Config
-ADD ./compose/php/www.conf /usr/local/etc/php-fpm.d/www.conf
-
-# ADD and set Group
-RUN addgroup -g 1000 laravel && adduser -G laravel -g laravel -s /bin/sh -D laravel
-
-# Create folder to run
-RUN mkdir -p /var/www/html
-
-# Set Profile
-RUN chown laravel:laravel /var/www/html
-
-# Work in the specific space
+# Set the working directory inside the container
 WORKDIR /var/www/html
 
-# Install dependencies
-RUN apk add --no-cache \
-    freetype \
-    libpng \
-    libjpeg-turbo \
-    freetype-dev \
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y \
+    curl \
     libpng-dev \
-    libjpeg-turbo-dev
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip
 
-RUN docker-php-ext-configure gd \
-    --with-freetype \
-    --with-jpeg 
+# Install PHP extensions required by Laravel
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-RUN NPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) && \
-    docker-php-ext-install -j${NPROC} gd 
+# Install Composer (dependency manager for PHP)
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-RUN apk del --no-cache freetype-dev libpng-dev libjpeg-turbo-dev
+# Copy the Laravel project files into the container
+COPY . .
 
-RUN docker-php-ext-install pdo pdo_mysql
+# Install project dependencies using Composer
+RUN composer install --no-interaction --no-dev --prefer-dist
 
-# install and enable xdebug
-RUN apk add --no-cache $PHPIZE_DEPS \
-	&& pecl install xdebug-2.9.7 \
-	&& docker-php-ext-enable xdebug
-#!/bin/sh
+# Generate the application key
+RUN php artisan key:generate
 
-# cp .env.example .env 
+# Expose port 8000 for accessing the Laravel service
+EXPOSE 8000
 
-php -v
-
-# php artisan
-# php /var/www/html/artisan migrate:fresh --seed
-
-# composer install 
-
-# docker-compose run --rm npm install 
-
-# docker-compose run --rm artisan clear:data
-# docker-compose run --rm artisan cache:clear 
-# docker-compose run --rm artisan view:clear 
-# docker-compose run --rm artisan route:clear 
-# docker-compose run --rm artisan clear-compiled 
-# docker-compose run --rm artisan config:cache
-# docker-compose run --rm artisan key:generate
-# docker-compose run --rm artisan storage:link
-# docker-compose run --rm artisan migrate --seed
-# docker-compose run --rm artisan passport:install
+# Start the Laravel service
+CMD php artisan serve --host=0.0.0.0 --port=8000
