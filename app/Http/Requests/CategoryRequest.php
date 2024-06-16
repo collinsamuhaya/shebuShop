@@ -21,8 +21,16 @@ class CategoryRequest extends FormRequest
      */
     public function rules(): array
     {
+        //return parent::toArray($request);
         return [
-            //
+
+             'name' => ['nullable','string'],
+             'description' => ['nullable','string'],
+            'categoryimage' => ['nullable', 'string'],
+            'images.*' => ['nullable', 'image'],
+            'deleted_images.*' => ['nullable', 'int'],
+            'image_positions.*' => ['nullable', 'int'],
+           
         ];
     }
 }

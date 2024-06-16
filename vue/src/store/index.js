@@ -92,27 +92,11 @@ state:{
       },
 getters:{},
 actions:{
-  createCategory({commit}, category) {
-    if (category.categoryimages && category.categoryimages.length) {
-      const form = new FormData();
-      form.append('name', category.name);
-      category.categoryimages.forEach(im => form.append('categoryimages[]', im))
-      form.append('description', category.description || '');
-      category = form;
-    }
-    return fetch('http://localhost:80/api/categorys',{
-      headers:{
-          "Content-Type":"application/json",
-           Accept:"application/json",
-      },
-      method:"POST",
-      body:JSON.stringify(category),
-  })
-  .then((res)=>{
-      alert(res)
-    commit("showToast", 'Category was successfully created');
-    return res
-  });
+  getCategory({commit}, id) {
+    return axiosClient.get(`/categorys/${id}`)
+  },
+  deleteCategory({commit}, id) {
+    return axiosClient.delete(`/categorys/${id}`)
   },
   updateCategory({commit}, category) {
     const id = category.id
@@ -120,35 +104,53 @@ actions:{
       const form = new FormData();
       form.append('id', category.id);
       form.append('name', category.name);
-      category.images.forEach(im => form.append(`categoryimage[${im.id}]`, im))
+      form.append('description', category.description);
+      category.categoryimage.forEach(im => form.append(`images[${im.id}]`, im))
       if (category.deleted_images) {
         category.deleted_images.forEach(id => form.append('deleted_images[]', id))
       }
-
-      form.append('description', category.description || '');
-
-      form.append('_method', 'PUT');
-      category = form;
-    } else {
-      category._method = 'PUT'
-    }
-    return axiosClient.post(`/products/${id}`, product)
-  },
-  getCategorys({ commit},categorys){
-    return fetch('http://localhost:80/api/index1',{
-        headers:{
-            "Content-Type":"application/json",
-             Accept:"application/json",
-        },
-        method:"POST",
-        body:JSON.stringify(categorys),
-    })
-    .then((res)=>{
+      for (let id in category.image_positions) {
+        form.append(`image_positions[${id}]`, category.image_positions[id])
+      }
       
-      commit("setCategorys");
-      return res
-    });
-    },
+      form.append('_method', 'PUT');
+      user = form;
+    } else {
+      user._method = 'PUT'
+    }
+    return axiosClient.post(`/categorys/${id}`, category)
+  },
+  getCategorys({commit, state}, {url = null, search = '', per_page, sort_field, sort_direction} = {}) {
+    commit('setCategorys', [true])
+    url = url || '/categorys'
+    const params = {
+      per_page: state.categorys.limit,
+    }
+    return axiosClient.get(url, {
+      params: {
+        ...params,
+        search, per_page, sort_field, sort_direction
+      }
+    })
+    .then((response) => {
+      commit('setCategorys', [false, response])
+    })
+    .catch(() => {
+      commit('setCategorys', [false])
+    })
+
+  }, 
+  createCategory({commit}, category) {
+    
+      const form = new FormData();
+    form.append('name', category.name);
+    form.append('description', category.description);
+    form.append('categoryimage', category.categoryimage);
+    category = form;
+        return axiosClient.post('/categorys', category)
+  }, 
+
+  
     deleteUser({commit}, id) {
       alert("delete")
       return axiosClient.delete(`/deleteuser/${id}`)
@@ -264,7 +266,7 @@ actions:{
        })
       .then((res)=> res.json())
        .then((res)=>{
-        alert(JSON.stringify(res.data))
+
              commit("setUser",res);
             
          return res
@@ -283,6 +285,7 @@ mutations:{
         state.user.token='null'
                   },
     showToast(state, message) {
+      alert(message)
       state.toast.show = true;
       state.toast.message = message;
             },
@@ -297,22 +300,19 @@ mutations:{
           sessionStorage.removeItem('TOKEN')
         }
             },
-    setCategorys(state, [loading, data = null]) {
 
-            if (data) {
-              state.categorys = {
-                ...state.categorys,
-                data: data.data,
-                links: data.meta?.links,
-                page: data.meta.current_page,
-                limit: data.meta.per_page,
-                from: data.meta.from,
-                to: data.meta.to,
-                total: data.meta.total,
+            setCategorys:(state,[loading, categoryData= null] )=>{
+              if(categoryData){
+                state.categorys=categoryData.data;
+                state.categorys.links= categoryData.data.meta?.links;
+                state.categorys.page= categoryData.data.meta.current_page;
+                state.categorys.limit= categoryData.data.meta.per_page;
+                state.categorys.from= categoryData.data.meta.from;
+                state.categorys.to= categoryData.data.meta.to;
+                state.categorys.total= categoryData.data.meta.total;            
+                
               }
-            }
-            state.categorys.loading = loading;
-          } ,
+            },        
           setUsers2:(state,[loading, userData= null] )=>{
             if(userData){
               state.usersindex2=userData.data;

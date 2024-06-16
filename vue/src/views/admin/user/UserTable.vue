@@ -68,7 +68,7 @@
         <td class="border-b p-2 ">{{ user.id }}</td>
         <td class="border-b p-2 ">
           <img v-if="user.userimage" class="w-16 h-16 object-cover" :src="user.userimage" :alt="user.name">
-          <img v-else class="w-16 h-16 object-cover" src="../../assets/noimage.png">
+          <img v-else class="w-16 h-16 object-cover" :src="require('../../assets/noimage.png')">
         </td>
         <td class="border-b p-2 max-w-[200px] whitespace-nowrap overflow-hidden text-ellipsis">
           {{ user.name }}
