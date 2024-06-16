@@ -5,7 +5,7 @@ LABEL authors="Collins Amuhaya"
 
 RUN mkdir -p /app/public
 
-COPY package.json webpack.mix.js package-lock.json /app/
+
 COPY resources/ /app/resources/
 
 WORKDIR /app
