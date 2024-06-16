@@ -17,13 +17,17 @@ Route::get('/user', function (Request $request) {
 
 //Route::get('test',function(){   Return 'success';    });
 
-    Route::apiResource('users', CategoryController::class);
+    Route::apiResource('users', AuthController::class);
     Route::apiResource('categorys', CategoryController::class);
     
     Route::get('/deleteuser/{id}', [AuthController::class, 'destroy']);
-    Route::get('/showuser/{id}', [AuthController::class, 'show']);
+    Route::get('/showuser/{id}', [AuthController::class, 'show']);    
     Route::post('/stores', [AuthController::class,'store']);
     Route::get('/index', [AuthController::class,'index']);
    // Route::get('/index2', [AuthController::class,'index2']);
    Route::post('/login', [AuthController::class, 'login']);
    Route::post('/stores', [AuthController::class,'store']);
+   Route::get('/showcategory/{id}', [CategoryController::class, 'show']);
+   Route::get('/categorysIndex', [CategoryController::class, 'index']);
+   Route::post('/categorysStores', [CategoryController::class, 'store']);
+   Route::get('/categorysDestroy/{id}', [CategoryController::class, 'destroy']);

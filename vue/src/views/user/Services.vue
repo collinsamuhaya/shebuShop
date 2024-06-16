@@ -7,7 +7,7 @@
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
           <div v-for="service in services" :key="service.id" class="flex flex-cols py-4 px-6 shadow-md bg-white hover:bg-gray-50 h-[470px] "  >
             <div >
-              <img  src="`../../assets/images/shoe.png`" alt="" class="w-full h-38 object-cover"/>
+              <img  :src="require('../../assets/images/shoe.png')"  alt="" class="w-full h-38 object-cover"/>
                    
                     <h4 class="mt-4 text-lg font-bold">{{service.name}}</h4>
                     <p class="mt-4 text-sm ">{{service.description}}</p>

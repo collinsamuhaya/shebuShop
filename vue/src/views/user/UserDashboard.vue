@@ -1,6 +1,6 @@
 <template>
     <div class="relative isolate overflow-hidden bg-gray-50 py-24 sm:py-32">
-      <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&crop=focalpoint&fp-y=.8&w=2830&h=1500&q=80&blend=111827&sat=-100&exp=15&blend-mode=multiply" alt="" class="absolute inset-0 -z-10 h-full w-full object-cover object-right md:object-center" />
+      <img :src="require('../../assets/images/hero_1.jpg')"  alt="" class="absolute inset-0 -z-10 h-full w-full object-cover object-right md:object-center" />
       <div class="hidden sm:absolute sm:-top-10 sm:right-1/2 sm:-z-10 sm:mr-10 sm:block sm:transform-gpu sm:blur-3xl" aria-hidden="true">
         <div class="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-tr from-[#ff4694] to-[#776fff] opacity-20" style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)" />
       </div>
@@ -9,8 +9,8 @@
       </div>
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
         <div class="mx-auto max-w-2xl lg:mx-0">
-          <h2 class="text-4xl font-bold tracking-tight text-white sm:text-6xl">shebu Shop</h2>
-          <p class="mt-6 text-lg leading-8 text-gray-300">We are well stocked and offer fast professional services and our products are competitively priced .Based on our daily operations and interactions with our clients we have established that the vast majority of the customers in all sectors.</p>
+          <h2 class="text-4xl font-bold tracking-tight text-white sm:text-6xl">WISEMAN’S PHARMARCY LTD</h2>
+          <p class="mt-6 text-lg leading-8 text-gray-300">We are well stocked and offer fast professional services and our products are competitively priced.</p>
         </div>
         <div class="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
           <div class="grid grid-cols-1 gap-x-8 gap-y-6 text-base font-semibold leading-7 text-white sm:grid-cols-2 md:flex lg:gap-x-10">
@@ -28,16 +28,17 @@
   </template>
   
   <script setup>
+   import backgroundimage from "../../assets/images/hero_1.jpg";
   const links = [
-    { name: 'Open roles', href: '#' },
-    { name: 'Internship program', href: '#' },
-    { name: 'Our values', href: '#' },
-    { name: 'Meet our leadership', href: '#' },
+    { name: 'Your Health Care Partners', href: '#' },
+    { name: 'At JF Centre- Ralph Bunche Road', href: '#' },
+    { name: 'Talk to Doctors for free', href: '#' },
+    { name: 'Delivery within Nairobi', href: '#' },
   ]
   const stats = [
-    { name: 'Offices worldwide', value: 'Why choose shebuShop?' },
-    { name: 'Full-time colleagues', value: 'Mission' },
-    { name: 'Hours per week', value: 'Vision' },
-    { name: 'Paid time off', value: 'Our values' },
+    { name: '24 Hours on-line services. Talk to Doctors for free. Delivery within Nairobi. Upload valid prescription', value: 'Why choose Wiseman\'s?' },
+    { name: 'To provide quality, affordable and patient centred products and services while ensuring efficiency.', value: 'Mission' },
+    { name: 'To be leaders in providing High quality pharmaceutical, personal health care and beauty products to our clients.', value: 'Vision' },
+    { name: 'Personalized Customer Service,    Integrity,  Honesty and   Passionate about our Quality of Products    ', value: 'Our values' },
   ]
   </script>

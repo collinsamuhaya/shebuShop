@@ -6,16 +6,30 @@
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-envelope" viewBox="0 0 18 18">
   <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z"/>
                    </svg>
-                   amuhaya.collins@gmail.com 
+                   wisemanspharmacy@gmail.com
     </router-link>
     <router-link :to="{name:''}" class="flex py-2 px-2 border border-transparent text-sm rounded-md font-semibold bg-transparent hover:bg-gray-100 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-phone" viewBox="0 0 18 18">
   <path d="M11 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM5 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
   <path d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
 </svg>
-                   +252721852289 
+0787590448
     </router-link>
- 
+<!-- component -->
+<!-- This is an example component -->
+<div class="pt-0 relative mx-auto text-gray-600 w-1/2">
+        <input class="border-2 border-gray-300 bg-white w-full h-8 px-5 pr-16 rounded-lg text-sm focus:outline-none"
+          type="search" name="search" placeholder="Search for Products">
+        <button type="submit" class="absolute right-0 top-0 mt-2 mr-4">
+          <svg class="text-gray-600 h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px"
+            viewBox="0 0 56.966 56.966" style="enable-background:new 0 0 56.966 56.966;" xml:space="preserve"
+            width="512px" height="512px">
+            <path
+              d="M55.146,51.887L41.588,37.786c3.486-4.144,5.396-9.358,5.396-14.786c0-12.682-10.318-23-23-23s-23,10.318-23,23  s10.318,23,23,23c4.761,0,9.298-1.436,13.177-4.162l13.661,14.208c0.571,0.593,1.339,0.92,2.162,0.92  c0.779,0,1.518-0.297,2.079-0.837C56.255,54.982,56.293,53.08,55.146,51.887z M23.984,6c9.374,0,17,7.626,17,17s-7.626,17-17,17  s-17-7.626-17-17S14.61,6,23.984,6z" />
+          </svg>
+        </button>
+      </div>
     <div class="absolute left-[max(-7rem,calc(50%-52rem))] top-1/2 -z-10 -translate-y-1/2 transform-gpu blur-2xl" aria-hidden="true">
       <div class="aspect-[577/310] w-[36.0625rem] bg-gradient-to-r from-[#ff80b5] to-[#9089fc] opacity-30" style="clip-path: polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)" />
     </div>
@@ -48,7 +62,7 @@
         <div class="flex h-16 items-center justify-between">
           <div class="flex items-center">
             <div class="flex-shrink-0">
-              <img class="h-8 w-8" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
+              <img class="h-8 w-8" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500" alt="WiseMan's Pharmacy" />
             </div>
             <div class="hidden md:block">
               <div class="ml-10 flex items-baseline space-x-4">
@@ -67,6 +81,10 @@
           </div>
           <div class="hidden md:block">
             <div class="ml-4 flex items-center md:ml-6">
+              <router-link :to="{name: 'AdminDashboard'} " class="flex py-2 px-4 border border-transparent text-sm rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+
+                   Admin Dashboard
+                 </router-link>
               <button type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                 <span class="absolute -inset-1.5" />
                 <span class="sr-only">View notifications</span>
@@ -153,7 +171,17 @@
                   </MenuItems>
                 </transition>
               </Menu>
-            </div>
+            <router-link :to="{name: 'Cart'} " class="h-screen  flex justify-center items-center">
+              <div class="relative py-2">
+                <div class="t-0 absolute left-3">
+                 <p class="flex h-2 w-2 items-center justify-center rounded-full bg-red-500 p-3 text-xs text-white">3</p>
+                </div>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="file: mt-4 h-6 w-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                </svg>
+              </div>
+            </router-link>
+          </div>
           </div>
           <div class="-mr-2 flex md:hidden">
             <!-- Mobile menu button -->
@@ -281,12 +309,12 @@ store.dispatch('logout')
 
 const navigation = [
   { name: 'Home', to:{name:'UserDashboard'}},
-  { name: 'About', to:{name:'About'}},
-  { name: 'Services', to:{name:'Services'}},
-  { name: 'Departments', to:{name:'About'} },
-  { name: 'Staff', to:{name:'About'} },
-  { name: 'Products', to:{name:'About'}},
-  { name: 'Contact', to:{name:'About'}},
+  { name: 'Shop By Category', to:{name:'ShopByCategory'}},
+  { name: 'Shop By Condition', to:{name:'Services'} },
+  { name: 'Product Overview', to:{name:'ProductOverview'} },
+  { name: 'Offers', to:{name:'About'} },
+  { name: 'Submit a Prescription', to:{name:'About'}},
+  { name: 'Contact', to:{name:'Contact'}},
 ]
 const userNavigation = [
   { name: 'Your Profile', href: '#' },
