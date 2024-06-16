@@ -33,3 +33,4 @@ RUN rm -rf vendor composer.lock && \
 
 
 EXPOSE 8000
+CMD ["php-fpm"]
