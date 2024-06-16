@@ -1,4 +1,7 @@
 FROM php:8.0-fpm
+FROM node:14.15.0 as vuejs
+
+LABEL authors="Collins Amuhaya"
 
  #Copy composer.lock and composer.json
 #COPY  ./composer.json /var/www/
@@ -60,5 +63,5 @@ USER www
 #RUN composer install --no-scripts --no-autoloader
 
 # Expose port 9000 and start php-fpm server
-EXPOSE 9000
+# EXPOSE 9000
 CMD ["php-fpm"]
