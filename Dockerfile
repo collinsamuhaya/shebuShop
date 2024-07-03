@@ -36,6 +36,15 @@ WORKDIR /var/www/html
 
 # Copy application files
 COPY . .
+COPY . /var/www/html
+COPY --from=vendor /app/vendor/ /var/www/html/vendor/
+COPY --from=vuejs /app/public/js/ /var/www/html/public/js/
+COPY --from=vuejs /app/public/css/ /var/www/html/public/css/
+COPY --from=vuejs /app/mix-manifest.json /var/www/html/mix-manifest.json
+
+
+RUN npm install && npm run prod
+
 
 # Expose port 80 (default for Apache)
 EXPOSE 80
