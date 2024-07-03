@@ -1,3 +1,9 @@
+#Client App
+FROM node:14.15.0 as vuejs
+
+LABEL authors="Collins Amuhaya"
+RUN npm install && npm run prod
+
 # Use the official PHP 8.1 Apache image as base
 FROM php:8.1-apache
 
