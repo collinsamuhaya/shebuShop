@@ -23,6 +23,7 @@ RUN docker-php-ext-install mysqli pdo pdo_mysql
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Set working directory
+RUN mkdir -p /var/www/html
 WORKDIR /var/www/html
 
 # Copy application files
