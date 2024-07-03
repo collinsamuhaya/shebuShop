@@ -2,7 +2,16 @@
 FROM node:14.15.0 as vuejs
 
 LABEL authors="Collins Amuhaya"
+
+RUN mkdir -p /app/public
+
+
+COPY resources/ /app/resources/
+
+WORKDIR /app
+
 RUN npm install && npm run prod
+
 
 # Use the official PHP 8.1 Apache image as base
 FROM php:8.1-apache
@@ -23,7 +32,6 @@ RUN docker-php-ext-install mysqli pdo pdo_mysql
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Set working directory
-RUN mkdir -p /var/www/html
 WORKDIR /var/www/html
 
 # Copy application files
