@@ -4,7 +4,6 @@ FROM node:14.15.0 as vuejs
 LABEL authors="Collins Amuhaya"
 
 
-RUN npm install && npm run prod
 
 
 # Use the official PHP 8.1 Apache image as base
@@ -31,10 +30,6 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . .
 COPY . /var/www/html
-
-
-
-RUN npm install && npm run prod
 
 
 # Expose port 80 (default for Apache)
