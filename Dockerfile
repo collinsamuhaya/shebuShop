@@ -3,12 +3,6 @@ FROM node:14.15.0 as vuejs
 
 LABEL authors="Collins Amuhaya"
 
-RUN mkdir -p /app/public
-
-
-COPY resources/ /app/resources/
-
-WORKDIR /app
 
 RUN npm install && npm run prod
 
@@ -37,10 +31,7 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . .
 COPY . /var/www/html
-COPY --from=vendor /app/vendor/ /var/www/html/vendor/
-COPY --from=vuejs /app/public/js/ /var/www/html/public/js/
-COPY --from=vuejs /app/public/css/ /var/www/html/public/css/
-COPY --from=vuejs /app/mix-manifest.json /var/www/html/mix-manifest.json
+
 
 
 RUN npm install && npm run prod
