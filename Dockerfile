@@ -1,10 +1,11 @@
 FROM richarvey/nginx-php-fpm:1.7.2
 
 COPY . .
-COPY ./vendor/ /var/www/html/public/vendor/
+
 # Image config
 ENV SKIP_COMPOSER 1
 ENV WEBROOT /var/www/html/public
+COPY ./vendor/ /var/www/html/public/vendor/
 ENV PHP_ERRORS_STDERR 1
 ENV RUN_SCRIPTS 1
 ENV REAL_IP_HEADER 1
