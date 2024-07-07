@@ -19,7 +19,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 FROM richarvey/nginx-php-fpm:1.7.2
 
 COPY . .
-
+COPY --from=vendor /app/vendor/ /var/www/html/public/vendor/
 # Image config
 ENV SKIP_COMPOSER 1
 ENV WEBROOT /var/www/html/public
