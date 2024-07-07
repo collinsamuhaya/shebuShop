@@ -1,21 +1,3 @@
-# Use the official PHP 8.1 Apache image as base
-FROM php:8.1-apache
-
-# Install additional dependencies
-RUN apt-get update && \
-    apt-get install -y \
-        zip \
-        git \
-        default-mysql-client && \
-    rm -rf /var/lib/apt/lists/*
-
-
-# Enable PHP extensions
-RUN docker-php-ext-install mysqli pdo pdo_mysql
-
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
 FROM richarvey/nginx-php-fpm:1.7.2
 
 COPY . .
