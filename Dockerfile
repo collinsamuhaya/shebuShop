@@ -1,11 +1,7 @@
 FROM richarvey/nginx-php-fpm:1.7.2
 # Install additional dependencies
 RUN apt-get update && \
-    apt-get install -y \
-        zip \
-        git \
-        default-mysql-client && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get upgrade -y 
 
 COPY . .
 
